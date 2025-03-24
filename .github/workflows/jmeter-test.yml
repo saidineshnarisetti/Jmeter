@@ -1,4 +1,4 @@
-name: JMeter Test
+name: JMeter Test and Report
 
 on:
   push:
@@ -16,14 +16,28 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Install Java (JMeter dependency)
-        run: sudo apt-get update && sudo apt-get install -y openjdk-11-jre-headless
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-11-jre-headless wget
 
       - name: Download and Extract Apache JMeter
         run: |
           wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
           tar -xzf apache-jmeter-5.6.3.tgz
 
-      - name: Run Flipkart JMeter Test
+      - name: Run Flipkart JMeter Test and Generate Report
         run: |
           ./apache-jmeter-5.6.3/bin/jmeter -n -t Flipkart.jmx -l results.jtl -e -o report
+
+      - name: Upload HTML Report Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: jmeter-html-report
+          path: report
+
+      - name: Upload JTL Results Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: jmeter-results
+          path: results.jtl
